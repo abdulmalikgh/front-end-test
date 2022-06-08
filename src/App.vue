@@ -1,28 +1,51 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Main />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import Main from './components/Main'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Main
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+html, body{
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  position: relative;
+  color: #202020;
+  font-size: 14px;
+  min-width: 1024px;
+}
+a {
+  color: #008ad6;
+  text-decoration: none;
+}
+a.disabled {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+a:focus,
+.btn:focus,
+a:active,
+.btn:active,
+a:active:focus,
+.btn:active:focus,
+a.active:focus,
+.btn.active:focus {
+  outline: 0;
 }
 </style>
