@@ -23,12 +23,19 @@
       <div id="sidePane" v-if="hidePane">
         <div class="backgrounds">
           <SelectImagesComponent 
-          @setActive="setActive" 
-          v-if="type == 'backgrounds'" 
-          :title="'Select Background'" 
-          :images="backgrounds"
-          :btnText="'Upload background Image'"
-          @fileUpload="fileUpload" />
+            @setActive="setActive" 
+            v-if="type == 'backgrounds'" 
+            :title="'Select Background'" 
+            :images="backgrounds"
+            :btnText="'Upload Background Image'"
+            @fileUpload="fileUpload" />
+          <SelectImagesComponent 
+            @setActive="setActive" 
+            v-if="type == 'frames'" 
+            :title="'Select Frame'" 
+            :images="frames"
+            :btnText="'Upload Frame'"
+            @fileUpload="fileUpload" />
         </div>
       </div>
       <!-- contains the background, frame and image -->
@@ -45,6 +52,7 @@
 
 <script>
 import backgrounds from '../helpers/backgrounds'
+import frames from '../helpers/frames'
 import SelectImagesComponent from '../components/SelectImagesComponent.vue'
 export default {
   name: 'main-images-component',
@@ -55,18 +63,21 @@ export default {
     return {
       hidePane: false,
       type: '',
-      backgrounds: backgrounds
+      backgrounds: backgrounds,
+      frames: frames
     }
   },
   methods:{
     fileUpload(image) {
       //Get background image 
-      const background = document.getElementById('wallpaper')
-      const reader = new FileReader();
-      reader.addEventListener("load", function () {
-        background.style.backgroundImage = `url(${ reader.result })`;
-      }, false);
-      if(image) reader.readAsDataURL(image);
+      if(this.type === 'backgrounds') {
+        const background = document.getElementById('wallpaper')
+        const reader = new FileReader();
+        reader.addEventListener("load", function () {
+          background.style.backgroundImage = `url(${ reader.result })`;
+        }, false);
+        if(image) reader.readAsDataURL(image);
+      }
     },
     changeBackgroundImage(image){
       //get background image 
