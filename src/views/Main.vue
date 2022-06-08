@@ -4,13 +4,13 @@
       <!-- contains only side navigation -->
       <div id="sideNavigation">
           <ul>
-            <li>
+            <li :class="[type == 'backgrounds' ? 'activeSidePane' :'']" @click="togglePane('backgrounds')">
               <p>
                 Backgrounds
               </p>
             </li>
             <ul>
-              <li>
+              <li  :class="[type == 'frames' ? 'activeSidePane' :'']" @click="togglePane('frames')">
                 <p>
                   Frames
                 </p>
@@ -18,7 +18,18 @@
             </ul>
           </ul>
       </div>
-
+      
+      <!-- side pain -->
+      <div id="sidePane" v-if="hidePane">
+        <div class="backgrounds">
+          <SelectImagesComponent 
+          @setActive="setActive" 
+          v-if="type == 'backgrounds'" 
+          :title="'Select Background'" 
+          :images="backgrounds"
+          :btnText="'Upload background Image'" />
+        </div>
+      </div>
       <!-- contains the background, frame and image -->
       <div id="wallpaper">
 
@@ -32,10 +43,46 @@
 </template>
 
 <script>
+import backgrounds from '../helpers/backgrounds'
+import SelectImagesComponent from '../components/SelectImagesComponent.vue'
 export default {
   name: 'main-images-component',
-  props: {
-    msg: String
+  components: {
+    SelectImagesComponent
+  },
+  data() {
+    return {
+      hidePane: false,
+      type: '',
+      backgrounds: backgrounds
+    }
+  },
+  methods:{
+    changeBackgroundImage(image){
+      const background = document.getElementById('wallpaper')
+      background.style.backgroundImage = `url(${image})`
+    },
+    setActive(image) {
+      this.backgrounds.forEach(background => {
+        if(background.id == image.id) {
+          background.active = !background.active
+        } else {
+          background.active = false
+        }
+      })
+      this.changeBackgroundImage(image.image)
+    },
+    togglePane(type) {
+      //show and hide popup pane
+      //toggle between backgrounds and frames content
+      if(this.type == type) {
+        this.hidePane = false
+        this.type = ''
+      } else {
+        this.hidePane = true
+        this.type = type
+      }
+    }
   }
 }
 </script>
@@ -60,8 +107,6 @@ export default {
   justify-content: center;
   padding:0px;
   ul {
-    margin:0px;
-    padding:0px;
     li{
       display: flex;
       justify-content: center;
@@ -70,7 +115,6 @@ export default {
       background-color: #008ad6;
       width:100px;
       height: 50px;
-      cursor: pointer;
       &:hover{
         color:#008ad6;
         background-color: #fff 
@@ -81,17 +125,38 @@ export default {
     }
   }
 }
+.activeSidePane{
+  color:#008ad6!important;
+  background-color: #fff!important
+}
+/* SIDE PANE */
+#sidePane{
+  width:250px;
+  height: 100vh;
+  display: flex;
+  position: absolute;
+  left:100px;
+  bottom:0;
+  top:0;
+  background:#fff;
+  z-index:100;
+  .backgrounds{
+    padding: 15px;
+  }
+}
 /* wall paper */
 #wallpaper{
-  background: url('../assets/wallpapers/wall1.jpg');
+  background: url('../assets/backgrounds/wall1.jpg');
   min-width: 730px;
   text-align: center;
   position: absolute;
   top: 0;
   left: 100px;
   bottom: 90px;
-  right: 80px;
+  right: 0px;
   overflow: hidden;
+  background-repeat: no-repeat;
+   background-size: 100% 100%;
   -webkit-user-select: none;
   /* Chrome all / Safari all */
   -moz-user-select: none;
@@ -123,9 +188,9 @@ export default {
   background-color: #008ad6;
   outline: none;
   border:none;
-  width: 300px;
+  width: 250px;
   max-width: 50%;
-  height: 30px;
+  height: 40px;
   cursor: pointer;
 }
 </style>

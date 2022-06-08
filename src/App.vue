@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Main from './components/Main'
+import Main from './views/Main.vue'
 export default {
   name: 'App',
   components: {
@@ -14,7 +14,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 html, body{
   width: 100%;
   height: 100%;
@@ -47,5 +47,13 @@ a:active:focus,
 a.active:focus,
 .btn.active:focus {
   outline: 0;
+}
+ul{
+  margin: 0px;
+  padding: 0px;
+  li{
+    cursor: pointer;
+    list-style: none;
+  }
 }
 </style>
