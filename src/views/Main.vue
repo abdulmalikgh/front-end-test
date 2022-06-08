@@ -27,7 +27,8 @@
           v-if="type == 'backgrounds'" 
           :title="'Select Background'" 
           :images="backgrounds"
-          :btnText="'Upload background Image'" />
+          :btnText="'Upload background Image'"
+          @fileUpload="fileUpload" />
         </div>
       </div>
       <!-- contains the background, frame and image -->
@@ -58,11 +59,24 @@ export default {
     }
   },
   methods:{
-    changeBackgroundImage(image){
+    fileUpload(image) {
+      //Get background image 
       const background = document.getElementById('wallpaper')
+      const reader = new FileReader();
+      reader.addEventListener("load", function () {
+        background.style.backgroundImage = `url(${ reader.result })`;
+      }, false);
+      if(image) reader.readAsDataURL(image);
+    },
+    changeBackgroundImage(image){
+      //get background image 
+      const background = document.getElementById('wallpaper')
+      //set background image to the selected image
       background.style.backgroundImage = `url(${image})`
     },
     setActive(image) {
+      //get active or selected image from user 
+      //set the select image as active and then reset other images active to false
       this.backgrounds.forEach(background => {
         if(background.id == image.id) {
           background.active = !background.active
@@ -73,8 +87,7 @@ export default {
       this.changeBackgroundImage(image.image)
     },
     togglePane(type) {
-      //show and hide popup pane
-      //toggle between backgrounds and frames content
+      //show and hide frames or background images content
       if(this.type == type) {
         this.hidePane = false
         this.type = ''
@@ -184,13 +197,6 @@ export default {
   padding-bottom: 20px;
 }
 .bottomNavigation .btn{
-  color:#fff;
-  background-color: #008ad6;
-  outline: none;
-  border:none;
   width: 250px;
-  max-width: 50%;
-  height: 40px;
-  cursor: pointer;
 }
 </style>

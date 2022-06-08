@@ -56,4 +56,13 @@ ul{
     list-style: none;
   }
 }
+.btn{
+  color:#fff;
+  background-color: #008ad6;
+  outline: none;
+  border:none;
+  max-width: 100%;
+  height: 40px;
+  cursor: pointer;
+}
 </style>
