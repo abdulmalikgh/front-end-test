@@ -10,7 +10,7 @@
               </p>
             </li>
             <ul>
-              <li  :class="[type == 'frames' ? 'activeSidePane' :'']" @click="togglePane('frames')">
+              <li v-if="uploadedImages.length" :class="[type == 'frames' ? 'activeSidePane' :'']" @click="togglePane('frames')">
                 <p>
                   Frames
                 </p>
@@ -40,11 +40,20 @@
       </div>
       <!-- contains the background, frame and image -->
       <div id="wallpaper">
-
+        <div class="wallPaperInner" id="wallpaperInner">
+          
+        </div>
       </div>
 
     <div class="bottomNavigation">
-      <button class="btn">Upload Image(s)</button>
+      <input 
+        type="file" 
+        accept="image/jpeg, image/png, image/jpg" 
+        ref="file" 
+        multiple="multiple"
+        @change="handleUploadImages"
+        id="uploadImages">
+      <button @click="uploadFile" class="btn">Upload Image(s)</button>
     </div>
     </div>
   </div>
@@ -63,11 +72,93 @@ export default {
     return {
       hidePane: false,
       type: '',
+      uploadFrame: false,
       backgrounds: backgrounds,
-      frames: frames
+      frames: frames,
+      uploadedImages: [],
+      width: '400px',
+      height: '400px',
+      frameInnerHeight: '350px',
+      frameInnerWidth: '350px'
     }
   },
   methods:{
+     setFrameBackground(image) {
+        let wallpaperInnerContainer = document.getElementById('wallpaperInner')
+        wallpaperInnerContainer.textContent = ''
+        for(let i = 0; i < this.uploadedImages.length; i++) {
+          //create frame and style it
+          let frame = document.createElement('div');
+          frame.style.width = this.width
+          frame.style.height = this.width
+          frame.style.backgroundRepeat = 'no-repeat'
+          frame.style.backgroundSize = '100% 100%'
+          frame.style.boxShadow = '4px 0 4px -4px rgba(0, 0, 0, 0.45)'
+          frame.style.display = 'flex'
+          frame.style.justifyContent = 'center'
+          frame.style.alignItems = 'center'
+          frame.style.margin = '15px'
+          frame.style.backgroundImage = `url(${image})`
+          //create container to hold frame image
+          let frameInner = document.createElement('div');
+          frameInner.style.width = this.frameInnerWidth
+          frameInner.style.height = this.frameInnerHeight
+          //create new Image
+          const reader = new FileReader();
+          let frameImage = document.createElement('img');
+          reader.addEventListener("load", function () {
+            frameImage.style.height = '100%'
+            frameImage.style.width = '100%'
+            frameImage.src = reader.result;
+            frameImage.padding = '30px'
+            frameInner.appendChild(frameImage)
+          }, false);
+          if(this.uploadedImages[i]) reader.readAsDataURL(this.uploadedImages[i]);
+          frame.appendChild(frameInner)
+          wallpaperInnerContainer.appendChild(frame)
+        }
+       
+     },
+     createFrame(frame) {
+      let wallpaperInnerContainer = document.getElementById('wallpaperInner')
+      wallpaperInnerContainer.textContent = ''
+      for(let i = 0; i < this.uploadedImages.length; i++) {
+        //create canvas for both frame and image
+        let canvas = document.createElement('canvas');
+        canvas.setAttribute('width', 450);
+        canvas.setAttribute('height', 500);
+        canvas.classList.add('canvasFrame')
+        let ctx = canvas.getContext('2d');
+        //create file reader instance to convert image to imag URl
+        const reader = new FileReader();
+        let frameImage = new Image()
+        frameImage.src = frame.image
+        //Draw frame on canvas
+        ctx.drawImage(frameImage,0,0,canvas.width, canvas.height);
+        //create new image image element
+        let image = document.createElement('img');
+        reader.addEventListener("load", function () {
+          //load image bofore adding it to the canvas
+          image.onload = function() {
+            //add image to the canvas
+            ctx.drawImage(image,150,100,image.width,image.height, 0,0,canvas.width,canvas.height);
+          }
+          // set image source to reader url
+          image.src = reader.result;
+        }, false);
+        if(this.uploadedImages[i]) reader.readAsDataURL(this.uploadedImages[i]);
+        //add newly created element to the DOM
+        wallpaperInnerContainer.appendChild(canvas,image,frameImage)
+      }
+    },
+    uploadFile() {
+      this.$refs.file.click()
+    },
+    handleUploadImages(e) {
+      this.uploadedImages =  e.target.files
+      this.type = 'frames'
+      this.hidePane = true
+    },
     fileUpload(image) {
       //Get background image 
       if(this.type === 'backgrounds') {
@@ -77,6 +168,9 @@ export default {
           background.style.backgroundImage = `url(${ reader.result })`;
         }, false);
         if(image) reader.readAsDataURL(image);
+      } else {
+        //this.createFrame(image)
+        
       }
     },
     changeBackgroundImage(image){
@@ -88,14 +182,27 @@ export default {
     setActive(image) {
       //get active or selected image from user 
       //set the select image as active and then reset other images active to false
-      this.backgrounds.forEach(background => {
-        if(background.id == image.id) {
-          background.active = !background.active
-        } else {
-          background.active = false
-        }
-      })
-      this.changeBackgroundImage(image.image)
+      if(this.type === 'backgrounds') {
+          this.backgrounds.forEach(background => {
+          if(background.id == image.id) {
+            background.active = !background.active
+          } else {
+            background.active = false
+          }
+        })
+        this.changeBackgroundImage(image.image)
+      } else {
+        this.frames.forEach(frame => {
+          if(frame.id == image.id) {
+            frame.active = !frame.active
+          } else {
+            frame.active = false
+          }
+        })
+        //this.createFrame(image)
+        //this.getFrameImage(image.image)
+        this.setFrameBackground(image.image)
+      }
     },
     togglePane(type) {
       //show and hide frames or background images content
@@ -180,7 +287,7 @@ export default {
   right: 0px;
   overflow: hidden;
   background-repeat: no-repeat;
-   background-size: 100% 100%;
+  background-size: 100% 100%;
   -webkit-user-select: none;
   /* Chrome all / Safari all */
   -moz-user-select: none;
@@ -193,8 +300,28 @@ export default {
   -webkit-box-shadow: 4px 0 4px -4px rgba(0, 0, 0, 0.45);
   -moz-box-shadow: 4px 0 4px -4px rgba(0, 0, 0, 0.45);
   box-shadow: 4px 0 4px -4px rgba(0, 0, 0, 0.45);
+  .wallPaperInner{
+   width: 100%;
+   height: 100%;
+   display: flex;
+   justify-content: center;
+   align-items:center;
+   flex-wrap: wrap;
+  }
 }
-
+.frameImage{
+  width: 400px;
+  height: 400px;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-box-shadow: 4px 0 4px -4px rgba(0, 0, 0, 0.45);
+  -moz-box-shadow: 4px 0 4px -4px rgba(0, 0, 0, 0.45);
+  box-shadow: 4px 0 4px -4px rgba(0, 0, 0, 0.45);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  z-index: 100;
+  padding: 30px;
+}
 /* Bottom Navigation */
 .bottomNavigation{
   width: 100%;
@@ -206,8 +333,11 @@ export default {
   justify-content: center;
   align-items: center;
   padding-bottom: 20px;
-}
-.bottomNavigation .btn{
-  width: 250px;
+  #uploadImages{
+    display: none;
+  }
+  .btn{
+    width: 250px;
+  }
 }
 </style>

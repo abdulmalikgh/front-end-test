@@ -52,6 +52,7 @@ export default {
     },
     handleFileChange(e) {
       this.$emit('fileUpload', e.target.files[0])
+      this.type = 'frames'
     }
   }
 }
