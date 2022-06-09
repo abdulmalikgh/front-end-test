@@ -10,7 +10,7 @@ export default [
     active:false
   },
   {
-    id:2,
+    id:3,
     image: require('../assets/frames/frame2.jpeg'),
     active:false
   }

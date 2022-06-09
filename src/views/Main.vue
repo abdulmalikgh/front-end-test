@@ -79,11 +79,13 @@ export default {
       width: '400px',
       height: '400px',
       frameInnerHeight: '350px',
-      frameInnerWidth: '350px'
+      frameInnerWidth: '350px',
+      frameImage:null,
     }
   },
   methods:{
-     setFrameBackground(image) {
+     setFrameBackground() {
+        let image = this.frameImage
         let wallpaperInnerContainer = document.getElementById('wallpaperInner')
         wallpaperInnerContainer.textContent = ''
         for(let i = 0; i < this.uploadedImages.length; i++) {
@@ -98,7 +100,17 @@ export default {
           frame.style.justifyContent = 'center'
           frame.style.alignItems = 'center'
           frame.style.margin = '15px'
-          frame.style.backgroundImage = `url(${image})`
+          
+          //check whether the user uploaded his own frame or used provided frames
+          if(image && image.image) {
+            frame.style.backgroundImage = `url(${image.image})`
+          } else {
+            const reader = new FileReader();
+            reader.addEventListener("load", function () {
+            frame.style.backgroundImage = `url(${reader.result})`
+            }, false);
+            if(image) reader.readAsDataURL(image);
+          }
           //create container to hold frame image
           let frameInner = document.createElement('div');
           frameInner.style.width = this.frameInnerWidth
@@ -119,38 +131,6 @@ export default {
         }
        
      },
-     createFrame(frame) {
-      let wallpaperInnerContainer = document.getElementById('wallpaperInner')
-      wallpaperInnerContainer.textContent = ''
-      for(let i = 0; i < this.uploadedImages.length; i++) {
-        //create canvas for both frame and image
-        let canvas = document.createElement('canvas');
-        canvas.setAttribute('width', 450);
-        canvas.setAttribute('height', 500);
-        canvas.classList.add('canvasFrame')
-        let ctx = canvas.getContext('2d');
-        //create file reader instance to convert image to imag URl
-        const reader = new FileReader();
-        let frameImage = new Image()
-        frameImage.src = frame.image
-        //Draw frame on canvas
-        ctx.drawImage(frameImage,0,0,canvas.width, canvas.height);
-        //create new image image element
-        let image = document.createElement('img');
-        reader.addEventListener("load", function () {
-          //load image bofore adding it to the canvas
-          image.onload = function() {
-            //add image to the canvas
-            ctx.drawImage(image,150,100,image.width,image.height, 0,0,canvas.width,canvas.height);
-          }
-          // set image source to reader url
-          image.src = reader.result;
-        }, false);
-        if(this.uploadedImages[i]) reader.readAsDataURL(this.uploadedImages[i]);
-        //add newly created element to the DOM
-        wallpaperInnerContainer.appendChild(canvas,image,frameImage)
-      }
-    },
     uploadFile() {
       this.$refs.file.click()
     },
@@ -158,6 +138,9 @@ export default {
       this.uploadedImages =  e.target.files
       this.type = 'frames'
       this.hidePane = true
+      if(this.frameImage) {
+        this.setFrameBackground()
+      }
     },
     fileUpload(image) {
       //Get background image 
@@ -169,8 +152,8 @@ export default {
         }, false);
         if(image) reader.readAsDataURL(image);
       } else {
-        //this.createFrame(image)
-        
+        this.frameImage = image
+        this.setFrameBackground()
       }
     },
     changeBackgroundImage(image){
@@ -199,9 +182,8 @@ export default {
             frame.active = false
           }
         })
-        //this.createFrame(image)
-        //this.getFrameImage(image.image)
-        this.setFrameBackground(image.image)
+        this.frameImage = image
+        this.setFrameBackground()
       }
     },
     togglePane(type) {
