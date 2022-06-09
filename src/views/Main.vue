@@ -191,6 +191,7 @@ export default {
         })
         this.frameImage = image
         this.setFrameBackground()
+        this.type = 'backgrounds'
       }
     },
     togglePane(type) {
