@@ -48,9 +48,11 @@ export default {
       this.$emit('setActive', image)
     },
     uploadFile() {
+      //set open file input
       this.$refs.file.click()
     },
     handleFileChange(e) {
+      //send uploaded file to parent component
       this.$emit('fileUpload', e.target.files[0])
       this.type = 'frames'
     }

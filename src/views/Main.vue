@@ -85,6 +85,7 @@ export default {
   },
   methods:{
      setFrameBackground() {
+        //set frame image
         let image = this.frameImage
         let wallpaperInnerContainer = document.getElementById('wallpaperInner')
         wallpaperInnerContainer.textContent = ''
@@ -101,10 +102,12 @@ export default {
           frame.style.alignItems = 'center'
           frame.style.margin = '15px'
           
-          //check whether the user uploaded his own frame or used provided frames
+          //check whether the user uploaded his own frame or use provided frames
           if(image && image.image) {
+            //if user select from provided frames set it as frame background
             frame.style.backgroundImage = `url(${image.image})`
           } else {
+            // if user uploaded own frame , set create url for the image
             const reader = new FileReader();
             reader.addEventListener("load", function () {
             frame.style.backgroundImage = `url(${reader.result})`
@@ -119,14 +122,17 @@ export default {
           const reader = new FileReader();
           let frameImage = document.createElement('img');
           reader.addEventListener("load", function () {
+            //set image width and height as it's parent width and height
             frameImage.style.height = '100%'
             frameImage.style.width = '100%'
             frameImage.src = reader.result;
             frameImage.padding = '30px'
+            //Insert created image into the inner frame component created
             frameInner.appendChild(frameImage)
           }, false);
           if(this.uploadedImages[i]) reader.readAsDataURL(this.uploadedImages[i]);
           frame.appendChild(frameInner)
+          //add frame to the dom
           wallpaperInnerContainer.appendChild(frame)
         }
        
@@ -138,6 +144,7 @@ export default {
       this.uploadedImages =  e.target.files
       this.type = 'frames'
       this.hidePane = true
+      //if user has already selected a frame should it instead and add images
       if(this.frameImage) {
         this.setFrameBackground()
       }
